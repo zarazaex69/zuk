@@ -204,7 +204,7 @@ Theme settings are stored in `~/.config/zuk/config.json`:
 - Issues: [github.com/zarazaex69/zuk/issues](https://github.com/zarazaex69/zuk/issues)
 - Releases: [github.com/zarazaex69/zuk/releases](https://github.com/zarazaex69/zuk/releases)
 - Install Script: [install.sh](https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh)
-- Sdk: [examples/README.md](https://github.com/zarazaex69/zuk/examples/README.md)
+- Sdk: [examples/README.md](examples/README.md)
 
 ## License 🐤
 

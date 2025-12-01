@@ -77,7 +77,9 @@ func (m Model) updateInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	default:
-		if len(msg.String()) == 1 || msg.Type == tea.KeySpace {
+		// Support multi-byte characters (e.g., Cyrillic, Chinese, etc.)
+		runes := []rune(msg.String())
+		if len(runes) == 1 || msg.Type == tea.KeySpace {
 			m.query += msg.String()
 		}
 	}

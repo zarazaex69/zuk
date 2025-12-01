@@ -10,18 +10,16 @@ Fast and lightweight command-line interface for DuckDuckGo search. Built with Go
   <img src="assets/logo.png" alt="ZUK Logo" width="200"/>
 </p>
 
-## Quick Start
+# Quick Start
 
-### Install
+## 🌼  Install
+
+**Quick Install (Linux/macOS):**
 
 ```bash
-# Using make
-make install
-
-# Or manually
-go build -o zuk cmd/zuk/main.go
-sudo mv zuk /usr/local/bin/
+curl -fsSL https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh | bash
 ```
+
 
 ## 🦆 Overview
 
@@ -204,6 +202,8 @@ Theme settings are stored in `~/.config/zuk/config.json`:
 
 - GitHub: [github.com/zarazaex69/zuk](https://github.com/zarazaex69/zuk)
 - Issues: [github.com/zarazaex69/zuk/issues](https://github.com/zarazaex69/zuk/issues)
+- Releases: [github.com/zarazaex69/zuk/releases](https://github.com/zarazaex69/zuk/releases)
+- Install Script: [install.sh](https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh)
 - Sdk: [examples/README.md](https://github.com/zarazaex69/zuk/examples/README.md)
 
 ## License 🐤

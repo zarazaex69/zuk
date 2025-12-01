@@ -4,7 +4,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/zarazaex69/zuk?style=flat-square&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-BSD-green?style=flat-square)](LICENSE)
 
-Fast and lightweight command-line interface for DuckDuckGo search. Built with Go and Bubble Tea for a smooth terminal experience.
+Fast and lightweight command-line interface for DuckDuckGo search. Built with Go and Bubble Tea for a smooth terminal experience, have sdk - see [Links](#links).
 
 <p align="center">
   <img src="assets/logo.png" alt="ZUK Logo" width="200"/>
@@ -25,7 +25,7 @@ sudo mv zuk /usr/local/bin/
 
 ## 🦆 Overview
 
- ZUK provides a privacy-focused search experience directly in your terminal. No API keys, no tracking, just fast DuckDuckGo searches with an intuitive TUI interface.
+ZUK provides a privacy-focused search experience directly in your terminal. No API keys, no tracking, just fast DuckDuckGo searches with an intuitive TUI interface, have sdk, See [Links](#links) for more information.
 
 ###  Key Features
 
@@ -37,6 +37,7 @@ sudo mv zuk /usr/local/bin/
 - **Keyboard Navigation** - Vim-style keybindings
 - **Customizable Themes** - 5 built-in color schemes
 - **Responsive Design** - Adapts to terminal size with scrolling
+- **SDK** - Programmatic access for integration into other Go applications
 
 ###  Technology Stack
 
@@ -111,6 +112,11 @@ make build
 zuk/
 ├── cmd/
 │   └── zuk/          # CLI entry point
+├── pkg/
+│   └── zuk/          # Public API package
+│       ├── client.go # DuckDuckGo client
+│       ├── client_test.go
+│       └── doc.go    # Package documentation
 ├── internal/
 │   ├── app/          # Application initialization
 │   ├── config/       # Configuration management
@@ -120,9 +126,12 @@ zuk/
 │   │   ├── view.go   # Rendering logic
 │   │   ├── update.go # Event handling
 │   │   └── themes.go # Color schemes
-│   └── search/       # DuckDuckGo search logic
-│       ├── search.go # API client
+│   └── search/       # DuckDuckGo search wrapper
+│       ├── search.go # Internal wrapper
 │       └── browser.go # Browser integration
+├── examples/         # Usage examples
+│   ├── simple/       # Basic usage
+│   └── advanced/     # Advanced usage
 ├── assets/           # Resources (logo)
 ├── .github/
 │   └── workflows/    # CI/CD pipelines
@@ -185,15 +194,17 @@ Theme settings are stored in `~/.config/zuk/config.json`:
 
 
 
-## Links
 
-- GitHub: [github.com/zarazaex69/zuk](https://github.com/zarazaex69/zuk)
-- Issues: [github.com/zarazaex69/zuk/issues](https://github.com/zarazaex69/zuk/issues)
 
 ## Author 
 
 **zarazaex** - [GitHub](https://github.com/zarazaex69)
 
+## Links
+
+- GitHub: [github.com/zarazaex69/zuk](https://github.com/zarazaex69/zuk)
+- Issues: [github.com/zarazaex69/zuk/issues](https://github.com/zarazaex69/zuk/issues)
+- Sdk: [examples/README.md](https://github.com/zarazaex69/zuk/examples/README.md)
 
 ## License 🐤
 

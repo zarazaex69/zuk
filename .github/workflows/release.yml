@@ -1,0 +1,149 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-cli:
+    name: Build CLI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            output: zuk-linux-amd64
+          - goos: linux
+            goarch: arm64
+            output: zuk-linux-arm64
+          - goos: darwin
+            goarch: amd64
+            output: zuk-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            output: zuk-darwin-arm64
+          - goos: windows
+            goarch: amd64
+            output: zuk-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Get version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build CLI
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          go build \
+            -ldflags="-w -s -X main.Version=${{ steps.version.outputs.VERSION }}" \
+            -o ${{ matrix.output }} \
+            ./cmd/zuk
+
+      - name: Create tarball (Unix)
+        if: matrix.goos != 'windows'
+        run: |
+          tar -czf ${{ matrix.output }}.tar.gz ${{ matrix.output }}
+          sha256sum ${{ matrix.output }}.tar.gz > ${{ matrix.output }}.tar.gz.sha256
+
+      - name: Create zip (Windows)
+        if: matrix.goos == 'windows'
+        run: |
+          zip ${{ matrix.output }}.zip ${{ matrix.output }}
+          sha256sum ${{ matrix.output }}.zip > ${{ matrix.output }}.zip.sha256
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: |
+            ${{ matrix.output }}*
+
+  create-release:
+    name: Create Release
+    needs: build-cli
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Get version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+            cat CHANGELOG.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG=Release ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## ZUK - DuckDuckGo CLI ${{ steps.version.outputs.VERSION }}
+
+            ### Installation
+
+            **Linux (x86_64)**:
+            ```bash
+            curl -L https://github.com/zarazaex69/zuk/releases/download/${{ steps.version.outputs.VERSION }}/zuk-linux-amd64.tar.gz | tar xz
+            sudo mv zuk-linux-amd64 /usr/local/bin/zuk
+            ```
+
+            **macOS (Apple Silicon)**:
+            ```bash
+            curl -L https://github.com/zarazaex69/zuk/releases/download/${{ steps.version.outputs.VERSION }}/zuk-darwin-arm64.tar.gz | tar xz
+            sudo mv zuk-darwin-arm64 /usr/local/bin/zuk
+            ```
+
+            **Windows**:
+            Download `zuk-windows-amd64.exe.zip`, extract and add to PATH.
+
+            ### Manual Installation
+
+            1. Download the appropriate binary for your platform
+            2. Extract the archive
+            3. Move the binary to your PATH
+            4. Make it executable: `chmod +x zuk` (Unix only)
+
+            ### Checksums
+
+            SHA256 checksums are provided for each binary.
+
+            ${{ steps.changelog.outputs.CHANGELOG }}
+          files: |
+            artifacts/**/*.tar.gz
+            artifacts/**/*.zip
+            artifacts/**/*.sha256
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

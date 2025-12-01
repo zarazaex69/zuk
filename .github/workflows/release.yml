@@ -44,6 +44,17 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Debug - List files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files in root:"
+          ls -la
+          echo "Files in cmd:"
+          ls -la cmd/ || echo "cmd directory not found"
+          echo "Files in cmd/zuk:"
+          ls -la cmd/zuk/ || echo "cmd/zuk directory not found"
+
       - name: Download dependencies
         run: go mod download
 

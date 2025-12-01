@@ -17,7 +17,7 @@ Fast and lightweight command-line interface for DuckDuckGo search. Built with Go
 **Quick Install (Linux/macOS):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zarazaex69/zuk/refs/heads/master/install.sh | bash
 ```
 
 

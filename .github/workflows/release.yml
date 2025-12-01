@@ -44,6 +44,9 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Download dependencies
+        run: go mod download
+
       - name: Build CLI
         env:
           GOOS: ${{ matrix.goos }}
@@ -53,7 +56,7 @@ jobs:
           go build \
             -ldflags="-w -s -X main.Version=${{ steps.version.outputs.VERSION }}" \
             -o ${{ matrix.output }} \
-            ./cmd/zuk/main.go
+            ./cmd/zuk
 
       - name: Create tarball (Unix)
         if: matrix.goos != 'windows'

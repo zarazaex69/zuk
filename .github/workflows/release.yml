@@ -53,7 +53,7 @@ jobs:
           go build \
             -ldflags="-w -s -X main.Version=${{ steps.version.outputs.VERSION }}" \
             -o ${{ matrix.output }} \
-            ./cmd/zuk
+            ./cmd/zuk/main.go
 
       - name: Create tarball (Unix)
         if: matrix.goos != 'windows'

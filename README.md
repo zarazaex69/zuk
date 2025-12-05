@@ -52,6 +52,9 @@ ZUK provides a privacy-focused search experience directly in your terminal. No A
 # Start ZUK
 zuk
 
+# Duckle with zuk 
+zuk text
+
 # Set theme
 zuk -t nya
 zuk --theme soft

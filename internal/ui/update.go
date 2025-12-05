@@ -6,11 +6,6 @@ import (
 	"github.com/zarazaex69/zuk/internal/search"
 )
 
-type searchResultMsg struct {
-	results []search.Result
-	err     error
-}
-
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -131,12 +126,5 @@ func (m *Model) ensureSelectedVisible() {
 		m.viewport.SetYOffset(selectedLine)
 	} else if selectedLine >= m.viewport.YOffset+m.viewport.Height {
 		m.viewport.SetYOffset(selectedLine - m.viewport.Height + linesPerResult)
-	}
-}
-
-func (m Model) performSearch() tea.Cmd {
-	return func() tea.Msg {
-		results, err := search.Search(m.query)
-		return searchResultMsg{results: results, err: err}
 	}
 }

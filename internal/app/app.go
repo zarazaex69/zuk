@@ -6,7 +6,7 @@ import (
 	"github.com/zarazaex69/zuk/internal/ui"
 )
 
-func Run(themeName string) error {
+func Run(themeName string, initialQuery string) error {
 	// Load theme from config if not specified
 	if themeName == "" {
 		cfg, err := config.Load()
@@ -17,7 +17,7 @@ func Run(themeName string) error {
 		}
 	}
 
-	p := tea.NewProgram(ui.NewModel(themeName), tea.WithAltScreen())
+	p := tea.NewProgram(ui.NewModel(themeName, initialQuery), tea.WithAltScreen())
 	_, err := p.Run()
 	return err
 }

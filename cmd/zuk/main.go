@@ -40,8 +40,14 @@ func main() {
 		}
 	}
 
+	// Get search query from remaining arguments
+	var initialQuery string
+	if len(flag.Args()) > 0 {
+		initialQuery = flag.Args()[0]
+	}
+
 	// Run app
-	if err := app.Run(themeName); err != nil {
+	if err := app.Run(themeName, initialQuery); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}

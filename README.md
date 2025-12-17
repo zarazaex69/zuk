@@ -1,27 +1,30 @@
-# 🪿 ZUK - DuckDuckGo CLI Search
+<div align="center">
 
-[![Release](https://img.shields.io/github/v/release/zarazaex69/zuk?style=flat-square&logo=github&color=blue)](https://github.com/zarazaex69/zuk/releases)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/zarazaex69/zuk?style=flat-square&logo=go)](https://go.dev/)
-[![License](https://img.shields.io/badge/license-BSD-green?style=flat-square)](LICENSE)
+<img src="assets/logo.png" alt="ZUK Logo" width="200"/>
+
+[![Release](https://img.shields.io/github/v/release/zarazaex69/zuk?style=flat-square&logo=github&color=0D1117)](https://github.com/zarazaex69/zuk/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/zarazaex69/zuk?style=flat-square&logo=go&color=0D1117)](https://go.dev/)
+[![License](https://img.shields.io/badge/license-BSD-green?style=flat-square&color=0D1117)](LICENSE)
+
+# ZUK - DuckDuckGo CLI Search
 
 Fast and lightweight command-line interface for DuckDuckGo search. Built with Go and Bubble Tea for a smooth terminal experience, have sdk - see [Links](#links).
 
-<p align="center">
-  <img src="assets/logo.png" alt="ZUK Logo" width="200"/>
-</p>
+</div>
 
-# Quick Start
 
-## 🌼  Install
+# Fast Start
 
-**Quick Install (Linux/macOS):**
+## Install
+
+**Fast Install (Linux/macOS):**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zarazaex69/zuk/refs/heads/master/install.sh | bash
 ```
 
 
-## 🦆 Overview
+## Overview
 
 ZUK provides a privacy-focused search experience directly in your terminal. No API keys, no tracking, just fast DuckDuckGo searches with an intuitive TUI interface, have sdk, See [Links](#links) for more information.
 
@@ -46,7 +49,7 @@ ZUK provides a privacy-focused search experience directly in your terminal. No A
 - **goquery** - HTML parsing for search results
 - **Make** - Build automation
 
-## 🦆 Usage
+## Usage
 
 ```bash
 # Start ZUK
@@ -83,7 +86,7 @@ ZUK comes with 5 built-in themes:
 
 Theme preference is saved in `~/.config/zuk/config.json`
 
-## 🦆 Development
+## Development
 
 ### Prerequisites
 
@@ -140,7 +143,7 @@ zuk/
 └── go.mod            # Go dependencies
 ```
 
-## 🦆 Make Commands
+## Make Commands
 
 ```bash
 make help      # Show available commands
@@ -153,7 +156,7 @@ make deps      # Download dependencies
 make tidy      # Tidy go modules
 ```
 
-## 🦆 Examples
+## Examples
 
 ```bash
 # Search with default theme
@@ -172,7 +175,7 @@ zuk -t nya
 zuk --list-themes
 ```
 
-## 🦆 How It Works
+## How It Works
 
 ZUK uses DuckDuckGo's Lite interface to perform searches:
 
@@ -196,25 +199,12 @@ Theme settings are stored in `~/.config/zuk/config.json`:
 
 
 
+<div align="center">
 
-## Author 
+**Contact**
+- Telegram: [zarazaex](https://t.me/zarazaexe)
+- Email: zarazaex@tuta.io
+- Site: [zarazaex.xyz](https://zarazaex.xyz)
 
-**zarazaex** - [GitHub](https://github.com/zarazaex69)
 
-## Links
-
-- GitHub: [github.com/zarazaex69/zuk](https://github.com/zarazaex69/zuk)
-- Issues: [github.com/zarazaex69/zuk/issues](https://github.com/zarazaex69/zuk/issues)
-- Releases: [github.com/zarazaex69/zuk/releases](https://github.com/zarazaex69/zuk/releases)
-- Install Script: [install.sh](https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh)
-- Sdk: [examples/README.md](examples/README.md)
-
-## License 🐤
-
-BSD License - See LICENSE file for details
-
-## Acknowledgments
-
-- Powered by [DuckDuckGo](https://duckduckgo.com)
-- Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea)
-- HTML parsing by [goquery](https://github.com/PuerkitoBio/goquery)
+</div>

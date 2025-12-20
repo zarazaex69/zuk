@@ -201,10 +201,14 @@ Theme settings are stored in `~/.config/zuk/config.json`:
 
 <div align="center">
 
-**Contact**
-- Telegram: [zarazaex](https://t.me/zarazaexe)
-- Email: zarazaex@tuta.io
-- Site: [zarazaex.xyz](https://zarazaex.xyz)
+---
 
+### Contact
+
+Telegram: [zarazaex](https://t.me/zarazaexe)
+<br>
+Email: [zarazaex@tuta.io](mailto:zarazaex@tuta.io)
+<br>
+Site: [zarazaex.xyz](https://zarazaex.xyz)
 
 </div>

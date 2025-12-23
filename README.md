@@ -2,9 +2,9 @@
 
 <img src="assets/logo.png" alt="ZUK Logo" width="200"/>
 
-[![Release](https://img.shields.io/github/v/release/zarazaex69/zuk?style=flat-square&logo=github&color=0D1117)](https://github.com/zarazaex69/zuk/releases)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/zarazaex69/zuk?style=flat-square&logo=go&color=0D1117)](https://go.dev/)
-[![License](https://img.shields.io/badge/license-BSD-green?style=flat-square&color=0D1117)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/zarazaex69/zuk?style=flat-square&logo=github&logoColor=white&color=0D1117&labelColor=0D1117)](https://github.com/zarazaex69/zuk/releases)
+![Golang](https://img.shields.io/badge/-Golang-0D1117?style=flat-square&logo=go&logoColor=00A7D0)
+[![License](https://img.shields.io/badge/license-BSD--2--Clause-0D1117?style=flat-square&logo=open-source-initiative&logoColor=green&labelColor=0D1117)](LICENSE)
 
 # ZUK - DuckDuckGo CLI Search
 

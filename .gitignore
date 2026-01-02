@@ -2,7 +2,6 @@
 #
 /bin/
 /dist/
-/mo
 /main
 *.exe
 *.exe~

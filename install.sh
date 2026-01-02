@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-# ZUK CLI Installation Script
 # Usage: curl -fsSL https://raw.githubusercontent.com/zarazaex69/zuk/main/install.sh | bash
 
 REPO="zarazaex69/zuk"
 BINARY_NAME="zuk"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m' 
 
-# Logging functions
 log_info() {
     echo -e "${GREEN}[INFO]${NC} $1"
 }
@@ -32,15 +29,12 @@ log_step() {
     echo -e "${CYAN}[STEP]${NC} $1"
 }
 
-# Print banner
 print_banner() {
     echo -e "${CYAN}"
-    echo "  🦆 ZUK - DuckDuckGo CLI"
-    echo "  ======================="
+    echo "  ZUK - DuckDuckGo CLI"
     echo -e "${NC}"
 }
 
-# Detect OS and architecture
 detect_platform() {
     log_step "Detecting platform..."
     
@@ -77,7 +71,6 @@ detect_platform() {
     log_info "Detected platform: $PLATFORM"
 }
 
-# Get latest release version
 get_latest_version() {
     log_step "Fetching latest release..."
     
@@ -91,7 +84,6 @@ get_latest_version() {
     log_info "Latest version: $LATEST_VERSION"
 }
 
-# Download and install binary
 install_binary() {
     log_step "Installing ZUK..."
     
@@ -102,18 +94,15 @@ install_binary() {
 
     log_info "Downloading $archive_name..."
 
-    # Create temporary directory
     local tmp_dir=$(mktemp -d)
     cd "$tmp_dir"
 
-    # Download binary archive
     if ! curl -fsSL -o "$archive_name" "$download_url"; then
         log_error "Failed to download binary"
         rm -rf "$tmp_dir"
         exit 1
     fi
 
-    # Download checksum
     if ! curl -fsSL -o "${archive_name}.sha256" "$checksum_url"; then
         log_warn "Failed to download checksum, skipping verification"
     else
@@ -129,11 +118,9 @@ install_binary() {
         fi
     fi
 
-    # Extract archive
     log_info "Extracting archive..."
     tar -xzf "$archive_name"
 
-    # Install binary
     log_info "Installing to $INSTALL_DIR..."
     if [ -w "$INSTALL_DIR" ]; then
         mv "$binary_name" "$INSTALL_DIR/$BINARY_NAME"
@@ -144,14 +131,12 @@ install_binary() {
         sudo chmod +x "$INSTALL_DIR/$BINARY_NAME"
     fi
 
-    # Cleanup
     cd - >/dev/null
     rm -rf "$tmp_dir"
     
     log_info "Installation complete!"
 }
 
-# Verify installation
 verify_installation() {
     log_step "Verifying installation..."
     
@@ -164,7 +149,6 @@ verify_installation() {
     fi
 }
 
-# Print usage instructions
 print_usage() {
     echo ""
     echo -e "${GREEN}Quick Start:${NC}"
@@ -180,7 +164,6 @@ print_usage() {
     echo ""
 }
 
-# Main installation flow
 main() {
     print_banner
     detect_platform

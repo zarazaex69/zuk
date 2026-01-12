@@ -6,52 +6,66 @@ import (
 	"github.com/zarazaex69/zuk/internal/search"
 )
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
+const (
+	headerHeight    = 4
+	footerHeight    = 2
+	linesPerResult  = 4
+	verticalMargins = headerHeight + footerHeight
+)
 
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.width = msg.Width
-		m.height = msg.Height
-
-		headerHeight := 4
-		footerHeight := 2
-		verticalMargins := headerHeight + footerHeight
-
-		if !m.ready {
-			m.viewport = viewport.New(msg.Width, msg.Height-verticalMargins)
-			m.viewport.YPosition = headerHeight
-			m.ready = true
-		} else {
-			m.viewport.Width = msg.Width
-			m.viewport.Height = msg.Height - verticalMargins
-		}
-
-		if m.state == stateResults {
-			m.viewport.SetContent(m.renderResultsList())
-		}
-
-		return m, nil
+		return m.handleResize(msg), nil
 
 	case tea.KeyMsg:
-		switch m.state {
-		case stateInput:
-			return m.updateInput(msg)
-		case stateResults:
-			return m.updateResults(msg)
-		}
+		return m.handleKey(msg)
 
 	case searchResultMsg:
-		m.state = stateResults
-		m.results = msg.results
-		m.err = msg.err
-		m.selectedIdx = 0
-		m.viewport.SetContent(m.renderResultsList())
-		m.viewport.GotoTop()
-		return m, nil
+		return m.handleSearchResult(msg), nil
 	}
 
-	return m, cmd
+	return m, nil
+}
+
+func (m Model) handleResize(msg tea.WindowSizeMsg) Model {
+	m.width = msg.Width
+	m.height = msg.Height
+
+	if !m.ready {
+		m.viewport = viewport.New(msg.Width, msg.Height-verticalMargins)
+		m.viewport.YPosition = headerHeight
+		m.ready = true
+	} else {
+		m.viewport.Width = msg.Width
+		m.viewport.Height = msg.Height - verticalMargins
+	}
+
+	if m.state == stateResults {
+		m.viewport.SetContent(m.renderResultsList())
+	}
+
+	return m
+}
+
+func (m Model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch m.state {
+	case stateInput:
+		return m.updateInput(msg)
+	case stateResults:
+		return m.updateResults(msg)
+	}
+	return m, nil
+}
+
+func (m Model) handleSearchResult(msg searchResultMsg) Model {
+	m.state = stateResults
+	m.results = msg.results
+	m.err = msg.err
+	m.selectedIdx = 0
+	m.viewport.SetContent(m.renderResultsList())
+	m.viewport.GotoTop()
+	return m
 }
 
 func (m Model) updateInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -60,10 +74,11 @@ func (m Model) updateInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 
 	case "enter":
-		if m.query != "" {
-			m.state = stateLoading
-			return m, m.performSearch()
+		if m.query == "" {
+			return m, nil
 		}
+		m.state = stateLoading
+		return m, m.performSearch()
 
 	case "backspace":
 		if len(m.query) > 0 {
@@ -72,7 +87,6 @@ func (m Model) updateInput(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	default:
-		// Support multi-byte characters (e.g., Cyrillic, Chinese, etc.)
 		runes := []rune(msg.String())
 		if len(runes) == 1 || msg.Type == tea.KeySpace {
 			m.query += msg.String()
@@ -118,13 +132,14 @@ func (m Model) updateResults(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) ensureSelectedVisible() {
-	// Each result takes approximately 4 lines
-	linesPerResult := 4
 	selectedLine := m.selectedIdx * linesPerResult
 
 	if selectedLine < m.viewport.YOffset {
 		m.viewport.SetYOffset(selectedLine)
-	} else if selectedLine >= m.viewport.YOffset+m.viewport.Height {
+		return
+	}
+
+	if selectedLine >= m.viewport.YOffset+m.viewport.Height {
 		m.viewport.SetYOffset(selectedLine - m.viewport.Height + linesPerResult)
 	}
 }

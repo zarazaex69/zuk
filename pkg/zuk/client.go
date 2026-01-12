@@ -55,23 +55,43 @@ func (c *Client) Search(query string) ([]Result, error) {
 	return c.SearchWithOptions(query, nil)
 }
 
-// SearchWithOptions performs a search with custom options
 func (c *Client) SearchWithOptions(query string, opts *SearchOptions) ([]Result, error) {
-	formData := url.Values{}
-	formData.Set("q", query)
+	formData := c.buildFormData(query, opts)
 
-	if opts != nil {
-		if opts.Region != "" {
-			formData.Set("kl", opts.Region)
-		}
-		if opts.TimeRange != "" {
-			formData.Set("df", opts.TimeRange)
-		}
-	} else {
-		formData.Set("kl", "")
-		formData.Set("df", "")
+	req, err := c.createRequest(formData)
+	if err != nil {
+		return nil, err
 	}
 
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return parseResults(body)
+}
+
+func (c *Client) buildFormData(query string, opts *SearchOptions) url.Values {
+	formData := url.Values{}
+	formData.Set("q", query)
+	formData.Set("kl", "")
+	formData.Set("df", "")
+
+	if opts == nil {
+		return formData
+	}
+
+	if opts.Region != "" {
+		formData.Set("kl", opts.Region)
+	}
+	if opts.TimeRange != "" {
+		formData.Set("df", opts.TimeRange)
+	}
+
+	return formData
+}
+
+func (c *Client) createRequest(formData url.Values) (*http.Request, error) {
 	req, err := http.NewRequest("POST", "https://lite.duckduckgo.com/lite/", strings.NewReader(formData.Encode()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -84,22 +104,26 @@ func (c *Client) SearchWithOptions(query string, opts *SearchOptions) ([]Result,
 	req.Header.Set("Origin", "https://lite.duckduckgo.com")
 	req.Header.Set("Referer", "https://lite.duckduckgo.com/")
 
+	return req, nil
+}
+
+func (c *Client) doRequest(req *http.Request) (string, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to perform search: %w", err)
+		return "", fmt.Errorf("failed to perform search: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 
-	return parseResults(string(body))
+	return string(body), nil
 }
 
 func parseResults(html string) ([]Result, error) {

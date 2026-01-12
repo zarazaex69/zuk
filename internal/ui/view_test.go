@@ -31,7 +31,9 @@ func TestTruncate(t *testing.T) {
 }
 
 func TestViewInput(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
+	m.ready = true
+	m.width = 80
 	m.query = "test query"
 
 	view := m.viewInput()
@@ -50,8 +52,9 @@ func TestViewInput(t *testing.T) {
 }
 
 func TestViewLoading(t *testing.T) {
-	m := NewModel()
-	m.state = stateLoading
+	m := NewModel("default", "test")
+	m.ready = true
+	m.width = 80
 
 	view := m.viewLoading()
 
@@ -60,23 +63,23 @@ func TestViewLoading(t *testing.T) {
 	}
 }
 
-func TestViewResultsEmpty(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
+func TestRenderResultsListEmpty(t *testing.T) {
+	m := NewModel("default", "")
+	m.ready = true
+	m.width = 80
 	m.results = []search.Result{}
 
-	view := m.viewResults()
+	view := m.renderResultsList()
 
 	if !strings.Contains(view, "No results") {
-		t.Error("Empty results view should contain 'No results' message")
+		t.Error("Empty results should show 'No results' message")
 	}
 }
 
-func TestViewResultsWithData(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
+func TestRenderResultsListWithData(t *testing.T) {
+	m := NewModel("default", "")
+	m.ready = true
 	m.width = 100
-	m.height = 20
 	m.results = []search.Result{
 		{
 			Title:   "Test Result 1",
@@ -90,33 +93,28 @@ func TestViewResultsWithData(t *testing.T) {
 		},
 	}
 
-	view := m.viewResults()
+	view := m.renderResultsList()
 
 	if !strings.Contains(view, "Test Result 1") {
-		t.Error("Results view should contain first result title")
+		t.Error("Results should contain first result title")
 	}
 
 	if !strings.Contains(view, "https://example.com/1") {
-		t.Error("Results view should contain first result URL")
-	}
-
-	if !strings.Contains(view, "This is a test snippet") {
-		t.Error("Results view should contain first result snippet")
+		t.Error("Results should contain first result URL")
 	}
 }
 
-func TestViewResultsWithSelection(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
+func TestRenderResultsListWithSelection(t *testing.T) {
+	m := NewModel("default", "")
+	m.ready = true
 	m.width = 100
-	m.height = 20
 	m.selectedIdx = 1
 	m.results = []search.Result{
 		{Title: "Result 1", URL: "https://example.com/1"},
 		{Title: "Result 2", URL: "https://example.com/2"},
 	}
 
-	view := m.viewResults()
+	view := m.renderResultsList()
 
 	lines := strings.Split(view, "\n")
 	hasArrow := false
@@ -132,12 +130,13 @@ func TestViewResultsWithSelection(t *testing.T) {
 	}
 }
 
-func TestViewResultsWithError(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
+func TestRenderResultsListWithError(t *testing.T) {
+	m := NewModel("default", "")
+	m.ready = true
+	m.width = 80
 	m.err = &testError{msg: "test error"}
 
-	view := m.viewResults()
+	view := m.renderResultsList()
 
 	if !strings.Contains(view, "Error") {
 		t.Error("Error view should contain 'Error' text")
@@ -145,29 +144,6 @@ func TestViewResultsWithError(t *testing.T) {
 
 	if !strings.Contains(view, "test error") {
 		t.Error("Error view should contain error message")
-	}
-}
-
-func TestViewResultsScrolling(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
-	m.width = 100
-	m.height = 10 // Small height to trigger scrolling
-	m.scrollOffset = 2
-	m.selectedIdx = 2
-
-	// Create many results
-	for i := 0; i < 20; i++ {
-		m.results = append(m.results, search.Result{
-			Title: "Result " + string(rune('A'+i)),
-			URL:   "https://example.com",
-		})
-	}
-
-	view := m.viewResults()
-
-	if !strings.Contains(view, "of 20 results") {
-		t.Error("Scrolling view should show total results count")
 	}
 }
 

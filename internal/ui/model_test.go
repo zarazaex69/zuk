@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewModel(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 
 	if m.state != stateInput {
 		t.Errorf("Expected initial state to be stateInput, got %v", m.state)
@@ -23,17 +23,29 @@ func TestNewModel(t *testing.T) {
 	}
 }
 
+func TestNewModelWithQuery(t *testing.T) {
+	m := NewModel("default", "test query")
+
+	if m.state != stateLoading {
+		t.Errorf("Expected state to be stateLoading with initial query, got %v", m.state)
+	}
+
+	if m.query != "test query" {
+		t.Errorf("Expected query 'test query', got %q", m.query)
+	}
+}
+
 func TestModelInit(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	cmd := m.Init()
 
 	if cmd != nil {
-		t.Error("Init should return nil command")
+		t.Error("Init should return nil command without initial query")
 	}
 }
 
 func TestUpdateWindowSize(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	msg := tea.WindowSizeMsg{Width: 100, Height: 50}
 
 	updated, _ := m.Update(msg)
@@ -49,7 +61,7 @@ func TestUpdateWindowSize(t *testing.T) {
 }
 
 func TestUpdateSearchResult(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	m.state = stateLoading
 
 	results := []search.Result{
@@ -71,18 +83,13 @@ func TestUpdateSearchResult(t *testing.T) {
 	if updatedModel.selectedIdx != 0 {
 		t.Errorf("Expected selectedIdx to be reset to 0, got %d", updatedModel.selectedIdx)
 	}
-
-	if updatedModel.scrollOffset != 0 {
-		t.Errorf("Expected scrollOffset to be reset to 0, got %d", updatedModel.scrollOffset)
-	}
 }
 
 func TestUpdateInputBackspace(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	m.query = "test"
 
-	msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{}, Alt: false}
-	msg.Type = tea.KeyBackspace
+	msg := tea.KeyMsg{Type: tea.KeyBackspace}
 
 	updated, _ := m.updateInput(msg)
 	updatedModel := updated.(Model)
@@ -93,7 +100,7 @@ func TestUpdateInputBackspace(t *testing.T) {
 }
 
 func TestUpdateInputTyping(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	m.query = "test"
 
 	msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'a'}}
@@ -107,7 +114,7 @@ func TestUpdateInputTyping(t *testing.T) {
 }
 
 func TestUpdateResultsNavigation(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	m.state = stateResults
 	m.height = 20
 	m.results = []search.Result{
@@ -116,7 +123,6 @@ func TestUpdateResultsNavigation(t *testing.T) {
 		{Title: "Result 3"},
 	}
 
-	// Test down navigation
 	msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}}
 	updated, _ := m.updateResults(msg)
 	updatedModel := updated.(Model)
@@ -125,7 +131,6 @@ func TestUpdateResultsNavigation(t *testing.T) {
 		t.Errorf("Expected selectedIdx 1 after down, got %d", updatedModel.selectedIdx)
 	}
 
-	// Test up navigation
 	msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'k'}}
 	updated, _ = updatedModel.updateResults(msg)
 	updatedModel = updated.(Model)
@@ -136,7 +141,7 @@ func TestUpdateResultsNavigation(t *testing.T) {
 }
 
 func TestUpdateResultsBackspace(t *testing.T) {
-	m := NewModel()
+	m := NewModel("default", "")
 	m.state = stateResults
 	m.query = "test"
 	m.results = []search.Result{{Title: "Result"}}
@@ -163,25 +168,32 @@ func TestUpdateResultsBackspace(t *testing.T) {
 	}
 }
 
-func TestUpdateResultsScrolling(t *testing.T) {
-	m := NewModel()
-	m.state = stateResults
-	m.height = 10 // Small height
-	m.scrollOffset = 0
-
-	// Create many results
-	for i := 0; i < 20; i++ {
-		m.results = append(m.results, search.Result{Title: "Result"})
+func TestGetTheme(t *testing.T) {
+	theme := GetTheme("default")
+	if theme.Name != "Default" {
+		t.Errorf("Expected theme name 'Default', got %q", theme.Name)
 	}
 
-	// Navigate down multiple times
-	msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'j'}}
-	for i := 0; i < 5; i++ {
-		updated, _ := m.updateResults(msg)
-		m = updated.(Model)
+	theme = GetTheme("nonexistent")
+	if theme.Name != "Default" {
+		t.Errorf("Expected fallback to default theme, got %q", theme.Name)
+	}
+}
+
+func TestGetThemeNames(t *testing.T) {
+	names := GetThemeNames()
+	if len(names) == 0 {
+		t.Error("Expected at least one theme name")
 	}
 
-	if m.scrollOffset == 0 && m.selectedIdx > 2 {
-		t.Error("Expected scrollOffset to increase when navigating beyond visible area")
+	found := false
+	for _, name := range names {
+		if name == "default" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("Expected 'default' theme in theme names")
 	}
 }

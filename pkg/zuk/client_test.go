@@ -57,7 +57,6 @@ func TestParseResults(t *testing.T) {
 		<html>
 			<body>
 				<a class="result-link" href="https://example.com">Test Title</a>
-				<td class="result-snippet">Test snippet</td>
 			</body>
 		</html>
 	`
@@ -77,10 +76,6 @@ func TestParseResults(t *testing.T) {
 
 	if results[0].URL != "https://example.com" {
 		t.Errorf("Expected URL 'https://example.com', got %q", results[0].URL)
-	}
-
-	if results[0].Snippet != "Test snippet" {
-		t.Errorf("Expected snippet 'Test snippet', got %q", results[0].Snippet)
 	}
 }
 

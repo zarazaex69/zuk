@@ -7,6 +7,56 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type styles struct {
+	logo          lipgloss.Style
+	subtitle      lipgloss.Style
+	separator     lipgloss.Style
+	searchLabel   lipgloss.Style
+	query         lipgloss.Style
+	cursor        lipgloss.Style
+	helpBar       lipgloss.Style
+	helpKey       lipgloss.Style
+	loading       lipgloss.Style
+	count         lipgloss.Style
+	scroll        lipgloss.Style
+	err           lipgloss.Style
+	gray          lipgloss.Style
+	marker        lipgloss.Style
+	number        lipgloss.Style
+	title         lipgloss.Style
+	titleSelected lipgloss.Style
+	url           lipgloss.Style
+	snippet       lipgloss.Style
+}
+
+func (m Model) styles() styles {
+	return styles{
+		logo:          lipgloss.NewStyle().Foreground(m.theme.Logo).Bold(true),
+		subtitle:      lipgloss.NewStyle().Foreground(m.theme.Gray),
+		separator:     lipgloss.NewStyle().Foreground(m.theme.Separator),
+		searchLabel:   lipgloss.NewStyle().Foreground(m.theme.Cyan).Bold(true),
+		query:         lipgloss.NewStyle().Foreground(m.theme.White),
+		cursor:        lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true),
+		helpBar:       lipgloss.NewStyle().Foreground(m.theme.Gray),
+		helpKey:       lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true),
+		loading:       lipgloss.NewStyle().Foreground(m.theme.Cyan).Bold(true),
+		count:         lipgloss.NewStyle().Foreground(m.theme.Green),
+		scroll:        lipgloss.NewStyle().Foreground(m.theme.Gray).Italic(true),
+		err:           lipgloss.NewStyle().Foreground(m.theme.Red).Bold(true),
+		gray:          lipgloss.NewStyle().Foreground(m.theme.Gray),
+		marker:        lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true),
+		number:        lipgloss.NewStyle().Foreground(m.theme.Gray),
+		title:         lipgloss.NewStyle().Foreground(m.theme.White).Bold(true),
+		titleSelected: lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true),
+		url:           lipgloss.NewStyle().Foreground(m.theme.Cyan),
+		snippet:       lipgloss.NewStyle().Foreground(m.theme.Gray),
+	}
+}
+
+func (m Model) separator() string {
+	return m.styles().separator.Render(strings.Repeat("─", m.width-4))
+}
+
 func (m Model) View() string {
 	if !m.ready {
 		return "\n  Initializing..."
@@ -18,178 +68,94 @@ func (m Model) View() string {
 	case stateLoading:
 		return m.viewLoading()
 	case stateResults:
-		return m.viewResultsWithViewport()
+		return m.viewResults()
 	}
 	return ""
 }
 
 func (m Model) viewInput() string {
+	s := m.styles()
+	sep := m.separator()
+
 	var b strings.Builder
-
-	// Styles based on theme
-	logoStyle := lipgloss.NewStyle().Foreground(m.theme.Logo).Bold(true)
-	subtitleStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
-	separatorStyle := lipgloss.NewStyle().Foreground(m.theme.Separator)
-	searchLabelStyle := lipgloss.NewStyle().Foreground(m.theme.Cyan).Bold(true)
-	queryStyle := lipgloss.NewStyle().Foreground(m.theme.White)
-	cursorStyle := lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true)
-	helpBarStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
-	helpKeyStyle := lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true)
-
-	// Header
-	logo := logoStyle.Render("🦆 ZUK")
-	subtitle := subtitleStyle.Render(" - DuckDuckGo CLI Search")
-	b.WriteString("\n  " + logo + subtitle + "\n\n")
-
-	// Separator
-	sep := separatorStyle.Render(strings.Repeat("─", m.width-4))
+	b.WriteString("\n  " + s.logo.Render("🦆 ZUK") + s.subtitle.Render(" - DuckDuckGo CLI Search") + "\n\n")
 	b.WriteString("  " + sep + "\n\n")
-
-	// Search input
-	label := searchLabelStyle.Render("  Search: ")
-	query := queryStyle.Render(m.query)
-	cursor := cursorStyle.Render("█")
-	b.WriteString(label + query + cursor + "\n\n")
-
-	// Separator
+	b.WriteString(s.searchLabel.Render("  Search: ") + s.query.Render(m.query) + s.cursor.Render("█") + "\n\n")
 	b.WriteString("  " + sep + "\n\n")
-
-	// Help
-	help := helpBarStyle.Render("  Press ") +
-		helpKeyStyle.Render("Enter") +
-		helpBarStyle.Render(" to search, ") +
-		helpKeyStyle.Render("Esc") +
-		helpBarStyle.Render(" to quit")
-	b.WriteString(help + "\n")
+	b.WriteString(s.helpBar.Render("  Press ") + s.helpKey.Render("Enter") + s.helpBar.Render(" to search, ") + s.helpKey.Render("Esc") + s.helpBar.Render(" to quit") + "\n")
 
 	return b.String()
 }
 
 func (m Model) viewLoading() string {
+	s := m.styles()
+	sep := m.separator()
+
 	var b strings.Builder
-
-	logoStyle := lipgloss.NewStyle().Foreground(m.theme.Logo).Bold(true)
-	separatorStyle := lipgloss.NewStyle().Foreground(m.theme.Separator)
-	loadingStyle := lipgloss.NewStyle().Foreground(m.theme.Cyan).Bold(true)
-	queryStyle := lipgloss.NewStyle().Foreground(m.theme.White)
-
-	logo := logoStyle.Render("🦆 ZUK")
-	b.WriteString("\n  " + logo + "\n\n")
-
-	sep := separatorStyle.Render(strings.Repeat("─", m.width-4))
+	b.WriteString("\n  " + s.logo.Render("🦆 ZUK") + "\n\n")
 	b.WriteString("  " + sep + "\n\n")
-
-	loading := loadingStyle.Render("  🔍 Searching for: ") +
-		queryStyle.Render(m.query) +
-		loadingStyle.Render("...")
-	b.WriteString(loading + "\n")
+	b.WriteString(s.loading.Render("  🔍 Searching for: ") + s.query.Render(m.query) + s.loading.Render("...") + "\n")
 
 	return b.String()
 }
 
-func (m Model) viewResultsWithViewport() string {
+func (m Model) viewResults() string {
+	s := m.styles()
+	sep := m.separator()
+
 	var b strings.Builder
-
-	logoStyle := lipgloss.NewStyle().Foreground(m.theme.Logo).Bold(true)
-	countStyle := lipgloss.NewStyle().Foreground(m.theme.Green)
-	separatorStyle := lipgloss.NewStyle().Foreground(m.theme.Separator)
-	scrollStyle := lipgloss.NewStyle().Foreground(m.theme.Gray).Italic(true)
-	helpBarStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
-	helpKeyStyle := lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true)
-
-	// Header
-	logo := logoStyle.Render("🦆 ZUK")
-	resultCount := countStyle.Render(fmt.Sprintf(" (%d results)", len(m.results)))
-	b.WriteString("\n  " + logo + resultCount + "\n")
-
-	// Separator
-	sep := separatorStyle.Render(strings.Repeat("─", m.width-4))
+	b.WriteString("\n  " + s.logo.Render("🦆 ZUK") + s.count.Render(fmt.Sprintf(" (%d results)", len(m.results))) + "\n")
+	b.WriteString("  " + sep + "\n")
+	b.WriteString(m.viewport.View() + "\n")
 	b.WriteString("  " + sep + "\n")
 
-	// Viewport content
-	b.WriteString(m.viewport.View())
-	b.WriteString("\n")
-
-	// Footer separator
-	b.WriteString("  " + sep + "\n")
-
-	// Scroll info
-	scrollPercent := scrollStyle.Render(fmt.Sprintf("  [%d/%d]", m.selectedIdx+1, len(m.results)))
+	scrollInfo := s.scroll.Render(fmt.Sprintf("  [%d/%d]", m.selectedIdx+1, len(m.results)))
 	if m.viewport.TotalLineCount() > m.viewport.Height {
-		scrollPercent += scrollStyle.Render(fmt.Sprintf(" %.0f%%", m.viewport.ScrollPercent()*100))
+		scrollInfo += s.scroll.Render(fmt.Sprintf(" %.0f%%", m.viewport.ScrollPercent()*100))
 	}
-	b.WriteString(scrollPercent + "\n")
+	b.WriteString(scrollInfo + "\n")
 
-	// Help bar
-	help := helpBarStyle.Render("  ") +
-		helpKeyStyle.Render("↑/↓") + helpBarStyle.Render(" navigate  ") +
-		helpKeyStyle.Render("Enter") + helpBarStyle.Render(" open  ") +
-		helpKeyStyle.Render("Backspace") + helpBarStyle.Render(" new search  ") +
-		helpKeyStyle.Render("q") + helpBarStyle.Render(" quit")
-	b.WriteString(help)
+	b.WriteString(s.helpBar.Render("  ") +
+		s.helpKey.Render("↑/↓") + s.helpBar.Render(" navigate  ") +
+		s.helpKey.Render("Enter") + s.helpBar.Render(" open  ") +
+		s.helpKey.Render("Backspace") + s.helpBar.Render(" new search  ") +
+		s.helpKey.Render("q") + s.helpBar.Render(" quit"))
 
 	return b.String()
 }
 
 func (m Model) renderResultsList() string {
-	errorStyle := lipgloss.NewStyle().Foreground(m.theme.Red).Bold(true)
-	grayStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
-	markerStyle := lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true)
-	numberStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
-	titleStyle := lipgloss.NewStyle().Foreground(m.theme.White).Bold(true)
-	titleSelectedStyle := lipgloss.NewStyle().Foreground(m.theme.Yellow).Bold(true)
-	urlStyle := lipgloss.NewStyle().Foreground(m.theme.Cyan)
-	snippetStyle := lipgloss.NewStyle().Foreground(m.theme.Gray)
+	s := m.styles()
 
 	if m.err != nil {
-		return errorStyle.Render("  Error: " + m.err.Error())
+		return s.err.Render("  Error: " + m.err.Error())
 	}
 
 	if len(m.results) == 0 {
-		return grayStyle.Render("  No results found.")
+		return s.gray.Render("  No results found.")
 	}
+
+	maxWidth := max(m.width-8, 40)
 
 	var b strings.Builder
-	maxWidth := m.width - 8
-	if maxWidth < 40 {
-		maxWidth = 40
-	}
-
 	for i, result := range m.results {
 		isSelected := i == m.selectedIdx
 
-		// Selection marker
-		var marker string
+		marker := "   "
 		if isSelected {
-			marker = markerStyle.Render(" → ")
-		} else {
-			marker = "   "
+			marker = s.marker.Render(" → ")
 		}
 
-		// Number
-		num := numberStyle.Render(fmt.Sprintf("%2d. ", i+1))
-
-		// Title
-		title := truncateRunes(result.Title, maxWidth-10)
-		var titleStyled string
+		titleStyle := s.title
 		if isSelected {
-			titleStyled = titleSelectedStyle.Render(title)
-		} else {
-			titleStyled = titleStyle.Render(title)
+			titleStyle = s.titleSelected
 		}
 
-		b.WriteString(marker + num + titleStyled + "\n")
+		b.WriteString(marker + s.number.Render(fmt.Sprintf("%2d. ", i+1)) + titleStyle.Render(truncate(result.Title, maxWidth-10)) + "\n")
+		b.WriteString(s.url.Render("      "+truncate(result.URL, maxWidth-6)) + "\n")
 
-		// URL
-		url := truncateRunes(result.URL, maxWidth-6)
-		urlStyled := urlStyle.Render("      " + url)
-		b.WriteString(urlStyled + "\n")
-
-		// Snippet
 		if result.Snippet != "" {
-			snippet := truncateRunes(result.Snippet, maxWidth-6)
-			snippetStyled := snippetStyle.Render("      " + snippet)
-			b.WriteString(snippetStyled + "\n")
+			b.WriteString(s.snippet.Render("      "+truncate(result.Snippet, maxWidth-6)) + "\n")
 		}
 
 		b.WriteString("\n")
@@ -198,7 +164,7 @@ func (m Model) renderResultsList() string {
 	return b.String()
 }
 
-func truncateRunes(s string, maxLen int) string {
+func truncate(s string, maxLen int) string {
 	runes := []rune(s)
 	if len(runes) <= maxLen {
 		return s

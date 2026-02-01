@@ -188,7 +188,7 @@ ZUK uses DuckDuckGo's Lite interface to perform searches:
 
 ### Configuration
 
-Theme settings are stored in `~/.config/zuk/config.json`:
+Theme settings in `~/.config/zuk/config.json`:
 
 ```json
 {
